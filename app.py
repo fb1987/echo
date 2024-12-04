@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))  # Default to port 5000 for local testing
+    app.run(host="0.0.0.0", port=port)
+
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
