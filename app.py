@@ -13,6 +13,9 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ALGOLIA_API_KEY = os.getenv("ALGOLIA_API_KEY")
 ALGOLIA_APP_ID = os.getenv("ALGOLIA_APP_ID")
 
+ALGOLIA_INDEX_NAME = "dev_oceanmd"
+
+
 # Step 2: Generate Keywords with GPT
 def generate_keywords(query):
     gpt_payload = {
