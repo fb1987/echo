@@ -94,7 +94,7 @@ def generate_final_response(query, articles):
                 "role": "user",
                 "content": (
                     f"An Ocean user has sent you an inquiry: <strong>{query}</strong>.<br><br>"
-                    f"Here is the relevant documentation content to consider for your fulsome response that must be in HTML format:<br>{article_details}<br><br>"
+                    f"Here is the relevant documentation content to consider for your fulsome response that must be in HTML format:<br>{article_details}<br><br>. If there is no documention provided there, DO NOT attempt to answer the question."
                     f"Using this information, provide a detailed, structured, and accurate answer to the inquiry. The goal is that the user will have all the information they need and will not need to visit the source articles, so be thoughtful and detailed. If you don't have enough information to respond due to lack of articles or lack of relevance, tell the person asking that you aren't sure and to either try reframing their question or reaching out to OceanMD Support team for help."
                 )
             }
