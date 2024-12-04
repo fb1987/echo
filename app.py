@@ -79,7 +79,7 @@ def generate_final_response(query, articles):
     sources_section += "</ul>"
 
     gpt_payload = {
-        "model": "o1-preview-2024-09-12",
+        "model": "gpt-4o",
         "messages": [
             {
                 "role": "system",
