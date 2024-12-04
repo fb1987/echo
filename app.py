@@ -66,11 +66,17 @@ def search_algolia(keywords):
 
 # Step 4: Generate Final Response with GPT
 def generate_final_response(query, articles):
-    # Prepare article details with titles, links, and body_safe content
+    # Prepare article details with titles and body content for context
     article_details = "".join(
-        f"<h4>{article['title']}</h4><p>{article['body_safe']}</p><p><a href='{article['link']}' target='_blank'>Read full article</a></p>"
+        f"<h4>{article['title']}</h4><p>{article['body_safe']}</p>"
         for article in articles
     )
+
+    # Prepare sources directly in Python
+    sources_section = "<h3>Sources</h3><ul>"
+    for article in articles:
+        sources_section += f"<li><a href='https://support.cognisantmd.com/hc/en-us/articles/{article['id']}' target='_blank'>{article['title']}</a></li>"
+    sources_section += "</ul>"
 
     gpt_payload = {
         "model": "gpt-4o",
@@ -78,22 +84,17 @@ def generate_final_response(query, articles):
             {
                 "role": "system",
                 "content": (
-                    "You are a helpful assistant trained in healthcare IT and working at OceanMD where you manage the knowledge base. "
+                    "You are a helpful assistant trained in healthcare IT and working at OceanMD where you manage the knowledge base."
                     "You are an expert in answering user inquiries about Ocean, the platform containing several digital health tools like EMR-integrated eReferrals "
-                    "and secure patient messaging and forms. When asked a question, you carefully consider the relevant documentation before synthesizing your answer. "
-                    "You always provide all your sources as links at the end of your responses. You aren't afraid to say when you aren't sure or don't have enough information. "
-                    "Provide your answers formatted in HTML to be embedded in a webpage, including proper HTML tags for headings, lists, bold text, and hyperlinks."
+                    "and secure patient messaging and forms. When asked a question, you carefully consider the relevant documentation before synthesizing your answer."
                 )
             },
             {
                 "role": "user",
                 "content": (
-                    f"An Ocean user has sent you an inquiry and you need to provide a thoughtful and informed response. "
-                    f"Here is their inquiry: <strong>{query}</strong>.<br><br>"
-                    f"You performed a search through the Ocean documentation and identified the following relevant articles and their content:<br>{article_details}<br><br>"
-                    f"Using the information in the articles, carefully synthesize a response to the user's inquiry. "
-                    f"If you lack information required to address the inquiry, let the inquirer know that and do not ever try to make something up. "
-                    f"At the end of your response, include a section titled 'Sources' with links to the articles you referenced, formatted as an unordered HTML list."
+                    f"An Ocean user has sent you an inquiry: <strong>{query}</strong>.<br><br>"
+                    f"Here is the relevant documentation content to consider for your fulsome response:<br>{article_details}<br><br>"
+                    f"Using this information, provide a detailed, structured, and accurate answer to the inquiry. The goal is that the user will have all the information they need and will not need to visit the source articles, so be thoughtful and detailed. If you don't have enough information to respond due to lack of articles or lack of relevance, tell the person asking that you aren't sure and to either try reframing their question or reaching out to OceanMD Support team for help."
                 )
             }
         ]
@@ -105,7 +106,16 @@ def generate_final_response(query, articles):
         json=gpt_payload
     )
     response_data = response.json()
-    return response_data["choices"][0]["message"]["content"]
+
+    # Clean response to remove unwanted markers
+    raw_response = response_data["choices"][0]["message"]["content"]
+    cleaned_response = raw_response.strip("''''html").strip("''''")
+
+    # Append sources to the cleaned response
+    final_response = cleaned_response + sources_section
+
+    return final_response
+
 
 # Route for Handling Queries
 @app.route("/query", methods=["POST"])
