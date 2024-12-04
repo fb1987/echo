@@ -81,7 +81,7 @@ def generate_final_response(query, articles):
             },
             {
                 "role": "user",
-                "content": f"An Ocean user has sent you this inquiry: {query}. You performed a search through the Ocean documentation and identified the following articles:<ul>{article_list}</ul>. If the articles are not deemed relevant, or there are no results, inform the inquirer that you cannot help them at this time."
+                "content": f"An Ocean user has sent you this inquiry: {query}. You performed a search through the Ocean documentation and identified the following articles:<ul>{article_list}</ul>. carefully consider the relevant documentation before synthesizing your answer. You always provide all your sources as links at the end of your responses. You aren't afraid to say when you aren't sure or don't have enough information. Provide your answers formatted in HTML for email, including proper HTML tags for headings, lists, bold text, and hyperlinks. If the articles are not deemed relevant, or there are no results, inform the inquirer that you cannot help them at this time."
             }
         ]
     }
