@@ -15,7 +15,6 @@ ALGOLIA_APP_ID = os.getenv("ALGOLIA_APP_ID")
 
 ALGOLIA_INDEX_NAME = "dev_oceanmd"
 
-
 # Step 2: Generate Keywords with GPT
 def generate_keywords(query):
     gpt_payload = {
@@ -57,10 +56,22 @@ def search_algolia(keywords):
         },
         json=algolia_payload
     )
-    return response.json()["hits"]
+    articles = response.json()["hits"]
+
+    # Generate proper URLs for each article
+    for article in articles:
+        article["link"] = f"https://support.cognisantmd.com/hc/en-us/articles/{article['id']}"
+
+    return articles
 
 # Step 4: Generate Final Response with GPT
 def generate_final_response(query, articles):
+    # Prepare article details with titles and links
+    article_list = "".join(
+        f"<li><a href='{article['link']}' target='_blank'>{article['title']}</a></li>"
+        for article in articles
+    )
+
     gpt_payload = {
         "model": "gpt-4o",
         "messages": [
@@ -70,7 +81,7 @@ def generate_final_response(query, articles):
             },
             {
                 "role": "user",
-                "content": f"An Ocean user has sent you this inquiry: {query}. You performed a search through the Ocean documentation and identified the following articles: {articles}. If the articles are not deemed relevant, or there are no results, inform the inquirer that you cannot help them at this time."
+                "content": f"An Ocean user has sent you this inquiry: {query}. You performed a search through the Ocean documentation and identified the following articles:<ul>{article_list}</ul>. If the articles are not deemed relevant, or there are no results, inform the inquirer that you cannot help them at this time."
             }
         ]
     }
