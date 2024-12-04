@@ -66,9 +66,9 @@ def search_algolia(keywords):
 
 # Step 4: Generate Final Response with GPT
 def generate_final_response(query, articles):
-    # Prepare article details with titles and links
-    article_list = "".join(
-        f"<li><a href='{article['link']}' target='_blank'>{article['title']}</a></li>"
+    # Prepare article details with titles, links, and body_safe content
+    article_details = "".join(
+        f"<h4>{article['title']}</h4><p>{article['body_safe']}</p><p><a href='{article['link']}' target='_blank'>Read full article</a></p>"
         for article in articles
     )
 
@@ -77,11 +77,24 @@ def generate_final_response(query, articles):
         "messages": [
             {
                 "role": "system",
-                "content": "You are a helpful assistant trained in healthcare IT and working at OceanMD where you manage the knowledge base. You are an expert in answering user inquiries about Ocean, the platform containing several digital health tools like EMR-integrated eReferrals and secure patient messaging and forms. When asked a question, you carefully consider the relevant documentation before synthesizing your answer. You always provide all your sources as links at the end of your responses. You aren't afraid to say when you aren't sure or don't have enough information. Provide your answers formatted in HTML for email, including proper HTML tags for headings, lists, bold text, and hyperlinks."
+                "content": (
+                    "You are a helpful assistant trained in healthcare IT and working at OceanMD where you manage the knowledge base. "
+                    "You are an expert in answering user inquiries about Ocean, the platform containing several digital health tools like EMR-integrated eReferrals "
+                    "and secure patient messaging and forms. When asked a question, you carefully consider the relevant documentation before synthesizing your answer. "
+                    "You always provide all your sources as links at the end of your responses. You aren't afraid to say when you aren't sure or don't have enough information. "
+                    "Provide your answers formatted in HTML to be embedded in a webpage, including proper HTML tags for headings, lists, bold text, and hyperlinks."
+                )
             },
             {
                 "role": "user",
-                "content": f"An Ocean user has sent you this inquiry: {query}. You performed a search through the Ocean documentation and identified the following articles:<ul>{article_list}</ul>. carefully consider the relevant documentation before synthesizing your answer. You always provide all your sources as links at the end of your responses. You aren't afraid to say when you aren't sure or don't have enough information. Provide your answers formatted in HTML for email, including proper HTML tags for headings, lists, bold text, and hyperlinks. If the articles are not deemed relevant, or there are no results, inform the inquirer that you cannot help them at this time."
+                "content": (
+                    f"An Ocean user has sent you an inquiry and you need to provide a thoughtful and informed response. "
+                    f"Here is their inquiry: <strong>{query}</strong>.<br><br>"
+                    f"You performed a search through the Ocean documentation and identified the following relevant articles and their content:<br>{article_details}<br><br>"
+                    f"Using the information in the articles, carefully synthesize a response to the user's inquiry. "
+                    f"If you lack information required to address the inquiry, let the inquirer know that and do not ever try to make something up. "
+                    f"At the end of your response, include a section titled 'Sources' with links to the articles you referenced, formatted as an unordered HTML list."
+                )
             }
         ]
     }
