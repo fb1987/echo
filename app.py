@@ -84,18 +84,18 @@ def generate_final_response(query, articles):
             {
                 "role": "system",
                 "content": (
-                    "You are a helpful assistant trained in healthcare IT and working at OceanMD where you manage the knowledge base."
+                    "You are a helpful assistant trained in healthcare IT and working at OceanMD where you manage the knowledge base. "
                     "You are an expert in answering user inquiries about Ocean, the platform containing several digital health tools like EMR-integrated eReferrals "
-                    "and secure patient messaging and forms. When asked a question, you carefully consider the relevant documentation before synthesizing your answer, which is always formatted as HTML using headers, body, lists and links to provide clear, web-friendly responses."
-                    "If no contextual documentation is provided, then you WILL NOT attempt to answer the question EVER."
+                    "and secure patient messaging and forms. When asked a question, you carefully consider the relevant documentation before synthesizing your answer. "
+                    "You do not format the sources section; it will be handled separately. Focus on creating a concise, clear, and helpful response."
                 )
             },
             {
                 "role": "user",
                 "content": (
                     f"An Ocean user has sent you an inquiry: <strong>{query}</strong>.<br><br>"
-                    f"Here is the relevant documentation content to consider for your fulsome response that must be in HTML format:<br>{article_details}<br><br>. If there is no documention provided there, DO NOT attempt to answer the question."
-                    f"Using this information, provide a detailed, structured, and accurate answer to the inquiry. The goal is that the user will have all the information they need and will not need to visit the source articles, so be thoughtful and detailed. If you don't have enough information to respond due to lack of articles or lack of relevance, tell the person asking that you aren't sure and to either try reframing their question or reaching out to OceanMD Support team for help."
+                    f"Here is the relevant documentation content:<br>{article_details}<br><br>"
+                    f"Using this information, provide a detailed, structured, and accurate answer to the inquiry."
                 )
             }
         ]
@@ -106,16 +106,21 @@ def generate_final_response(query, articles):
         headers={"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"},
         json=gpt_payload
     )
+
     response_data = response.json()
+
+    # Log the raw response for debugging (optional)
+    print("Raw Response:", response_data["choices"][0]["message"]["content"])
 
     # Clean response to remove unwanted markers
     raw_response = response_data["choices"][0]["message"]["content"]
-    cleaned_response = raw_response.strip("'''html").strip("'''")
+    cleaned_response = raw_response.replace("'''html", "").replace("'''", "").strip()
 
     # Append sources to the cleaned response
     final_response = cleaned_response + sources_section
 
     return final_response
+
 
 
 # Route for Handling Queries
