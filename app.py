@@ -110,7 +110,7 @@ def generate_final_response(query, articles):
 
     # Clean response to remove unwanted markers
     raw_response = response_data["choices"][0]["message"]["content"]
-    cleaned_response = raw_response.strip("''''html").strip("''''")
+    cleaned_response = raw_response.strip("'''html").strip("'''")
 
     # Append sources to the cleaned response
     final_response = cleaned_response + sources_section
